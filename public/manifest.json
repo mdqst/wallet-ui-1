@@ -1,6 +1,6 @@
 {
-  "short_name": "Etherspot UI components",
-  "name": "Etherspot UI components Sample",
+  "short_name": "Wallet UI",
+  "name": "A Wallet UI made up of Etherspot UI components",
   "icons": [
       { "src": "/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
       { "src": "/icon-192.png", "type": "image/png", "sizes": "192x192" },
