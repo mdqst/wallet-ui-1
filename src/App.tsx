@@ -22,18 +22,20 @@
  */
 
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 
-// styles
-import './App.css';
+// routing
+import AppRoutes from '../src/routes/AppRoutes';
 
-function App() {
-    return (
-        <div className="App">
-            <header className="App-header">
-                <p>Wallet UI</p>
-            </header>
-        </div>
-    );
-}
+// App Component: Main entry point for your React application.
+const App: React.FC = () => {
+  return (
+    <Router>
+      {/* wrapping the entire application with BrowserRouter for enabling routing */}
+      <AppRoutes />
+      {/* including AppRoutes component, which defines the routing structure */}
+    </Router>
+  );
+};
 
 export default App;

@@ -22,21 +22,11 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
 
-// styles
-import './index.css';
-
-// local
-import App from './App';
-
-import reportWebVitals from './reportWebVitals';
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+const Login: React.FC = () => (
+  <div>
+    <h1>Login Component Here</h1>
+  </div>
 );
 
-reportWebVitals();
+export default Login;

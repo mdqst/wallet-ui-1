@@ -22,21 +22,24 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { Outlet } from 'react-router-dom';
 
-// styles
-import './index.css';
+// components
+import Header from '../components/NavHeader/Header';
 
-// local
-import App from './App';
+// container component serves as a layout wrapper for the application.
+const Container: React.FC = () => (
+  // the main container div with a minimum height of the full viewport.
+  <div className="min-h-full">
+    {/* include the navigation header component. */}
+    <Header />
 
-import reportWebVitals from './reportWebVitals';
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+    {/* 
+      the <Outlet /> component is a placeholder that will render the content 
+      of child routes defined in the route configuration.
+    */}
+    <Outlet />
+  </div>
 );
 
-reportWebVitals();
+export default Container;
