@@ -22,21 +22,44 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { Link } from 'react-router-dom';
 
-// styles
-import './index.css';
+// constants
+import { routes } from '../../constants/routes';
 
-// local
-import App from './App';
+/**
+ * NavigationMenu component renders links based on the provided routes.
+ * @returns JSX element representing the navigation menu.
+ */
 
-import reportWebVitals from './reportWebVitals';
+const NavigationMenu: React.FC = () => {
+  return (
+    <>
+      {routes.map((item) => (
+        <Link
+          key={item.name}
+          to={item.href}
+          className={classNames(
+            // can apply different styles
+            item.current ? 'bg-purple-300 text-black' : 'text-gray-300 hover:bg-purple-300 hover:text-black',
+            'rounded-md px-3 py-2 text-sm font-medium'
+          )}
+          aria-current={item.current ? 'page' : undefined}
+        >
+          {item.name}
+        </Link>
+      ))}
+    </>
+  );
+};
 
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+/**
+ * Utility function to join class names conditionally.
+ * @param classes - Array of class names.
+ * @returns Joined class names string.
+ */
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(' ');
+}
 
-reportWebVitals();
+export default NavigationMenu;

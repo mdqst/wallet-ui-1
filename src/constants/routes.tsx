@@ -21,22 +21,17 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+// define the shape of a route object with the IRoute interface.
+export interface IRoute {
+  name: string; // display name of the route.
+  href: string; // URL path associated with the route.
+  current: boolean; // indicates if the route is currently active.
+}
 
-// styles
-import './index.css';
-
-// local
-import App from './App';
-
-import reportWebVitals from './reportWebVitals';
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-reportWebVitals();
+// list of routes used for navigation in the walletUI.
+export const routes: IRoute[] = [
+  { name: 'Dashboard', href: '/dashboard', current: true },
+  { name: 'Home', href: '/home', current: false },
+  { name: 'Send', href: '/send', current: false },
+  { name: 'Logout', href: '/logout', current: false },
+];

@@ -22,21 +22,30 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom/client';
+import { Routes, Route } from 'react-router-dom';
 
-// styles
-import './index.css';
+// components
+import Login from '../components/Login/Login';
+import Dashboard from '../components/Dashboard/Dashboard';
+import Home from '../components/Home/Home';
+import Send from '../components/Send/Send';
+import Container from '../containers/Container';
 
-// local
-import App from './App';
+// AppRoutes Component: Handles walletUI routing using react-router-dom.
+const AppRoutes: React.FC = () => {
+  return (
+    <Routes>
+      {/* main Container route that wraps common layout elements */}
+      <Route path="/" element={<Container />}>
+        {/* individual routes within the Container */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/send" element={<Send />} />
+        <Route path="/logout" element={<Login />} />
+      </Route>
+    </Routes>
+  );
+};
 
-import reportWebVitals from './reportWebVitals';
-
-const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
-
-reportWebVitals();
+export default AppRoutes;
