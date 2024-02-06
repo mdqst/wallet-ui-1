@@ -24,6 +24,9 @@
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 
+// contexts
+import { NotificationProvider } from './context/NotificationContext';
+
 // routing
 import AppRoutes from '../src/routes/AppRoutes';
 
@@ -31,9 +34,14 @@ import AppRoutes from '../src/routes/AppRoutes';
 const App: React.FC = () => {
   return (
     <Router>
-      {/* wrapping the entire application with BrowserRouter for enabling routing */}
-      <AppRoutes />
-      {/* including AppRoutes component, which defines the routing structure */}
+      {/* Provide the NotificationProvider to manage and display notifications */}
+      <NotificationProvider>
+        {/* wrapping the entire application with BrowserRouter for enabling routing */}
+        <div>
+          <AppRoutes />
+        </div>
+        {/* including AppRoutes component, which defines the routing structure */}
+      </NotificationProvider>
     </Router>
   );
 };
