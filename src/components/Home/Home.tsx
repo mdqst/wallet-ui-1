@@ -22,11 +22,31 @@
  */
 
 import React from 'react';
+import { useNotification } from '../../context/NotificationContext';
 
-const Home: React.FC = () => (
-  <div>
-    <h1>Home Component here</h1>
-  </div>
-);
+const Home: React.FC = () => {
+  const { showNotification } = useNotification();
+
+  const handleErrorClick = () => {
+    showNotification({
+      type: 'error',
+      message: 'This is an error message from NotificationComponent',
+      options: { position: 'top-center' },
+    });
+  };
+
+  return (
+    <div className="p-4">
+      <h1>Home</h1>
+      {/* put click button to just test toast notification */}
+      <button
+        className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800"
+        onClick={handleErrorClick}
+      >
+        Show Error
+      </button>
+    </div>
+  );
+};
 
 export default Home;
