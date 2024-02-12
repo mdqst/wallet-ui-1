@@ -31,6 +31,6 @@ export const formatChainAsNum = (chainIdHex: string) => {
   return chainIdNum;
 };
 
-export const formatAddress = (addr: string) => {
+export const truncateAddress = (addr: string) => {
   return `${addr.substring(0, 8)}...`;
 };

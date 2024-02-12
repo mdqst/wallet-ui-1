@@ -34,19 +34,19 @@ import AppRoutes from '../src/routes/AppRoutes';
 // App Component: Main entry point for your React application.
 const App: React.FC = () => {
   return (
-    <AuthContextProvider>
-      {/* Wrap the entire application with the authentication context provider */}
-      <Router>
-        {/* Provide the NotificationProvider to manage and display notifications */}
-        <NotificationProvider>
+    <NotificationProvider>
+      {/* Provide the NotificationProvider to manage and display notifications */}
+      <AuthContextProvider>
+        {/* Wrap the entire application with the authentication context provider */}
+        <Router>
           {/* wrapping the entire application with BrowserRouter for enabling routing */}
           <div>
             <AppRoutes />
           </div>
           {/* including AppRoutes component, which defines the routing structure */}
-        </NotificationProvider>
-      </Router>
-    </AuthContextProvider>
+        </Router>
+      </AuthContextProvider>
+    </NotificationProvider>
   );
 };
 

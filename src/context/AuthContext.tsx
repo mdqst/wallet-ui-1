@@ -27,6 +27,7 @@ import React, { useState, useEffect, createContext, PropsWithChildren, useContex
 import detectEthereumProvider from '@metamask/detect-provider';
 import { useSDK } from '@metamask/sdk-react';
 import { PrimeSdk, MetaMaskWalletProvider } from '@etherspot/prime-sdk';
+import { useNotification } from '../context/NotificationContext';
 
 // Define wallet state
 interface WalletState {
@@ -63,6 +64,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const [wallet, setWallet] = useState(disconnectedState); // Wallet state
   const [primeSdk, setPrimeSdk] = useState<PrimeSdk | null>(null); // PrimeSdk instance
   const { sdk } = useSDK(); // MetaMask SDK hook
+  const { showNotification } = useNotification(); // notification contexts
 
   // Update wallet state
   const _updateWallet = useCallback(async (providedAccounts?: string[]) => {
@@ -151,7 +153,13 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         });
         updateWallet(accounts);
       } else {
-        console.log('account not found');
+        console.warn('No accounts were found, please add account first.');
+        // Show error notification if there's no account
+        showNotification({
+          type: 'error',
+          message: 'No accounts were found.',
+          options: { position: 'top-center' },
+        });
       }
     } catch (err: any) {
       console.error('Error connecting MetaMask:', err);
@@ -167,7 +175,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       setIsConnecting(false);
     } catch (error) {
       console.error('Error logging out:', error);
-      setErrorMessage('Error logging out');
+      setErrorMessage('Error logging out, please try again');
     }
   };
 

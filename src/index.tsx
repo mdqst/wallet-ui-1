@@ -42,7 +42,7 @@ root.render(
       sdkOptions={{
         // Providing options for MetaMask SDK
         dappMetadata: {
-          name: 'Wallet-ui', // name of app
+          name: 'Etherspot WalletUI', // name of app
           url: window.location.href, // URL of app
         },
       }}
