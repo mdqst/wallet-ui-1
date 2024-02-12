@@ -21,33 +21,16 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-
-// contexts
-import { NotificationProvider } from './context/NotificationContext';
-import { AuthContextProvider } from './context/AuthContext';
-
-// routing
-import AppRoutes from '../src/routes/AppRoutes';
-
-// App Component: Main entry point for your React application.
-const App: React.FC = () => {
-  return (
-    <AuthContextProvider>
-      {/* Wrap the entire application with the authentication context provider */}
-      <Router>
-        {/* Provide the NotificationProvider to manage and display notifications */}
-        <NotificationProvider>
-          {/* wrapping the entire application with BrowserRouter for enabling routing */}
-          <div>
-            <AppRoutes />
-          </div>
-          {/* including AppRoutes component, which defines the routing structure */}
-        </NotificationProvider>
-      </Router>
-    </AuthContextProvider>
-  );
+export const formatBalance = (rawBalance: string) => {
+  const balance = (parseInt(rawBalance) / 1000000000000000000).toFixed(2);
+  return balance;
 };
 
-export default App;
+export const formatChainAsNum = (chainIdHex: string) => {
+  const chainIdNum = parseInt(chainIdHex);
+  return chainIdNum;
+};
+
+export const formatAddress = (addr: string) => {
+  return `${addr.substring(0, 8)}...`;
+};

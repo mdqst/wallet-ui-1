@@ -30,19 +30,20 @@ import Dashboard from '../components/Dashboard/Dashboard';
 import Home from '../components/Home/Home';
 import Send from '../components/Send/Send';
 import Container from '../containers/Container';
+import Logout from '../components/Logout/Logout';
 
 // AppRoutes Component: Handles walletUI routing using react-router-dom.
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
+      <Route path="/" element={<Login />} />
       {/* main Container route that wraps common layout elements */}
       <Route path="/" element={<Container />}>
         {/* individual routes within the Container */}
-        <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/home" element={<Home />} />
         <Route path="/send" element={<Send />} />
-        <Route path="/logout" element={<Login />} />
+        <Route path="/logout" element={<Logout />} />
       </Route>
     </Routes>
   );
