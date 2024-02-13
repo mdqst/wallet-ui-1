@@ -21,33 +21,29 @@
  * SOFTWARE.
  */
 
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-
-// contexts
-import { NotificationProvider } from './context/NotificationContext';
-import { AuthContextProvider } from './context/AuthContext';
+import React, { useEffect } from 'react';
 
 // routing
-import AppRoutes from '../src/routes/AppRoutes';
+import { useNavigate } from 'react-router-dom';
 
-// App Component: Main entry point for your React application.
-const App: React.FC = () => {
-  return (
-    <NotificationProvider>
-      {/* Provide the NotificationProvider to manage and display notifications */}
-      <AuthContextProvider>
-        {/* Wrap the entire application with the authentication context provider */}
-        <Router>
-          {/* wrapping the entire application with BrowserRouter for enabling routing */}
-          <div>
-            <AppRoutes />
-          </div>
-          {/* including AppRoutes component, which defines the routing structure */}
-        </Router>
-      </AuthContextProvider>
-    </NotificationProvider>
-  );
+// contexts
+import { useAuth } from '../../context/AuthContext';
+
+const Logout: React.FC = () => {
+  // Accessing the logout function from the AuthContext
+  const { logout } = useAuth();
+  // Accessing the navigate function from react-router-dom
+  const navigate = useNavigate();
+
+  // Execute logout and navigate to '/' when the component mounts
+  useEffect(() => {
+    // Call the logout function to log the user out
+    logout();
+    // Navigate to the initial login page ('/') after logout
+    navigate('/');
+  }, []); // Empty dependency array ensures the effect runs only once when the component mounts
+  // Since the component doesn't render anything visible, it returns null
+  return null;
 };
 
-export default App;
+export default Logout;
