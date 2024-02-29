@@ -40,14 +40,11 @@ interface WalletState {
 interface AuthContextData {
   wallet: WalletState; // Wallet state containing accounts, balance, and chainId
   hasProvider: boolean | null; // Whether MetaMask provider is available
-  error: boolean; // Whether an error occurred or not
-  errorMessage: string; // Error message
   isConnecting: boolean; // Whether MetaMask is currently connecting or not
   sdkPerChain: PrimeSdk | null; // PrimeSdk instance
   walletProvider: WalletProviderLike | null | undefined; // PrimeSdk instance
   networks: Network[] | undefined;
   connectMetaMask: () => void; // Function to connect MetaMask
-  clearError: () => void; // Function to clear error message
   logout: () => void; // Function to log out
 }
 
@@ -61,8 +58,6 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData);
 export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const [hasProvider, setHasProvider] = useState<boolean | null>(null); // Whether MetaMask provider is available
   const [isConnecting, setIsConnecting] = useState(false); // Whether MetaMask is currently connecting
-  const [errorMessage, setErrorMessage] = useState(''); // Error message
-  const clearError = () => setErrorMessage(''); // Function to clear error message
   const [wallet, setWallet] = useState(disconnectedState); // Wallet state
   const [sdkPerChain, setSdkPerChain] = useState<PrimeSdk | null>(null); // PrimeSdk instance
   const [walletProvider, setWalletProvider] = useState<WalletProviderLike | null>(null); // Metamask instance
@@ -119,7 +114,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       const { walletProvider, sdkPerChain, networks } = await initializeSdkPerChainFromMetaMask();
       setStates(walletProvider, sdkPerChain, networks);
     } else {
-      console.error('MetaMask or compatible Ethereum provider not detected');
+      showNotification({
+        type: 'error',
+        message: `MetaMask or compatible Ethereum provider not detected`,
+        options: { position: 'top-center' },
+      });
     }
   }, []);
 
@@ -147,8 +146,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
           window.ethereum?.on('chainChanged', updateWalletAndAccounts);
         }
       } catch (error) {
-        console.error('Error detecting Ethereum provider:', error);
-        setErrorMessage('Error detecting Ethereum provider');
+        showNotification({
+          type: 'error',
+          message: `Error detecting Ethereum provider: ${error}`,
+          options: { position: 'top-center' },
+        });
       }
     };
     getProvider();
@@ -158,7 +160,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         window.ethereum?.removeListener('accountsChanged', updateWallet);
         window.ethereum?.removeListener('chainChanged', updateWalletAndAccounts);
       } catch (error) {
-        console.error('Error removing event listeners:', error);
+        showNotification({
+          type: 'error',
+          message: `Error removing event listeners: ${error}`,
+          options: { position: 'top-center' },
+        });
       }
     };
   }, [updateWallet, updateWalletAndAccounts]);
@@ -167,7 +173,6 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const connectMetaMask = async () => {
     setIsConnecting(true);
     if (!window.ethereum) {
-      console.warn('MetaMask is not installed or not accessible.');
       // Show error notification if MetaMask is not installed or not accessible
       showNotification({
         type: 'error',
@@ -192,22 +197,19 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         });
         updateWallet(accounts);
       } else {
-        console.warn('No accounts were found, please add an account first.');
         // Show error notification if there's no account
         showNotification({
           type: 'error',
-          message: 'No accounts were found.',
+          message: 'No accounts were found, please add an account first.',
           options: { position: 'top-center' },
         });
       }
     } catch (err: any) {
-      console.error('Error connecting MetaMask:', err);
       showNotification({
         type: 'error',
-        message: 'Error connecting MetaMask. Please check log and try again.',
+        message: `Error connecting MetaMask. Please check log and try again: ${err}`,
         options: { position: 'top-center' },
       });
-      setErrorMessage(err.message);
     }
     setIsConnecting(false);
   };
@@ -218,8 +220,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       setWallet(disconnectedState);
       setIsConnecting(false);
     } catch (error) {
-      console.error('Error logging out:', error);
-      setErrorMessage('Error logging out, please try again');
+      showNotification({
+        type: 'error',
+        message: `Error logging out. Please check log and try again: ${error}`,
+        options: { position: 'top-center' },
+      });
     }
   };
 
@@ -228,14 +233,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       value={{
         wallet,
         hasProvider,
-        error: !!errorMessage,
-        errorMessage,
         isConnecting,
         sdkPerChain,
         walletProvider,
         networks,
         connectMetaMask,
-        clearError,
         logout,
       }}
     >

@@ -37,7 +37,7 @@ export const truncateAddress = (addr: string) => {
   return `${addr.substring(0, 8)}...`;
 };
 
-export const getExplorerUrl = (chainId: number): string | undefined => {
+export const getExplorerUrl = (chainId: number): string | null => {
   const mainnetChain = mainnetSupportedChains.find((chain: { chainId: number }) => chain.chainId === chainId);
   if (mainnetChain) {
     return mainnetChain.explorerUrl;
@@ -48,7 +48,7 @@ export const getExplorerUrl = (chainId: number): string | undefined => {
     return testnetChain.explorerUrl;
   }
 
-  return undefined;
+  return null;
 };
 
 export const openTxExplorer = (txHash: string, selectedNetwork: number) => {
