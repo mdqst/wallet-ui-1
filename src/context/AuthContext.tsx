@@ -26,7 +26,7 @@ import React, { useState, useEffect, createContext, PropsWithChildren, useContex
 // Libraries
 import detectEthereumProvider from '@metamask/detect-provider';
 import { useSDK } from '@metamask/sdk-react';
-import { PrimeSdk, MetaMaskWalletProvider } from '@etherspot/prime-sdk';
+import { PrimeSdk, MetaMaskWalletProvider, WalletProviderLike, Network } from '@etherspot/prime-sdk';
 import { useNotification } from '../context/NotificationContext';
 
 // Define wallet state
@@ -43,7 +43,9 @@ interface AuthContextData {
   error: boolean; // Whether an error occurred or not
   errorMessage: string; // Error message
   isConnecting: boolean; // Whether MetaMask is currently connecting or not
-  primeSdk: PrimeSdk | null; // PrimeSdk instance
+  sdkPerChain: PrimeSdk | null; // PrimeSdk instance
+  walletProvider: WalletProviderLike | null | undefined; // PrimeSdk instance
+  networks: Network[] | undefined;
   connectMetaMask: () => void; // Function to connect MetaMask
   clearError: () => void; // Function to clear error message
   logout: () => void; // Function to log out
@@ -62,9 +64,34 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   const [errorMessage, setErrorMessage] = useState(''); // Error message
   const clearError = () => setErrorMessage(''); // Function to clear error message
   const [wallet, setWallet] = useState(disconnectedState); // Wallet state
-  const [primeSdk, setPrimeSdk] = useState<PrimeSdk | null>(null); // PrimeSdk instance
+  const [sdkPerChain, setSdkPerChain] = useState<PrimeSdk | null>(null); // PrimeSdk instance
+  const [walletProvider, setWalletProvider] = useState<WalletProviderLike | null>(null); // Metamask instance
+  const [networks, setNetworks] = useState<Network[]>([]); // Metamask instance
   const { sdk } = useSDK(); // MetaMask SDK hook
   const { showNotification } = useNotification(); // notification contexts
+
+  const setStates = (walletProviderValue: any, sdkPerChainValue: any, networksValue: any) => {
+    setWalletProvider(walletProviderValue);
+    setSdkPerChain(sdkPerChainValue);
+    setNetworks(networksValue);
+  };
+
+  // Get ChainID
+  const getChainId = async () => {
+    const chainId = (await window.ethereum?.request({
+      method: 'eth_chainId',
+    })) as string;
+    return chainId;
+  };
+
+  // Initialization of SDK and getting supported networks
+  const initializeSdkPerChainFromMetaMask = async () => {
+    const chainId = await getChainId();
+    const walletProvider = await MetaMaskWalletProvider.connect();
+    const sdkPerChain = new PrimeSdk(walletProvider, { chainId: Number(chainId), projectKey: '' });
+    const networks = sdkPerChain?.supportedNetworks;
+    return { walletProvider, sdkPerChain, networks };
+  };
 
   // Update wallet state
   const _updateWallet = useCallback(async (providedAccounts?: string[]) => {
@@ -82,18 +109,18 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       params: [accounts[0], 'latest'],
     })) as string;
 
-    // Get chain ID of account
-    const chainId = (await window.ethereum?.request({
-      method: 'eth_chainId',
-    })) as string;
+    // Call function to get chainID
+    const chainId = await getChainId();
 
-    // Wallet info setup in wallet state
+    // Set wallet state
     setWallet({ accounts, balance, chainId });
 
-    // Initiate PrimeSDK after login withe metamask and setting up PrimeSDK in global state
-    const metamaskProvider = await MetaMaskWalletProvider.connect();
-    const prime_sdk = new PrimeSdk(metamaskProvider, { chainId: Number(chainId), projectKey: '' });
-    setPrimeSdk(prime_sdk);
+    if (window.ethereum) {
+      const { walletProvider, sdkPerChain, networks } = await initializeSdkPerChainFromMetaMask();
+      setStates(walletProvider, sdkPerChain, networks);
+    } else {
+      console.error('MetaMask or compatible Ethereum provider not detected');
+    }
   }, []);
 
   const updateWalletAndAccounts = useCallback(() => _updateWallet(), [_updateWallet]);
@@ -113,6 +140,9 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
 
         if (provider) {
           updateWalletAndAccounts();
+          const { walletProvider, sdkPerChain, networks } = await initializeSdkPerChainFromMetaMask();
+          setStates(walletProvider, sdkPerChain, networks);
+
           window.ethereum?.on('accountsChanged', updateWallet);
           window.ethereum?.on('chainChanged', updateWalletAndAccounts);
         }
@@ -121,9 +151,7 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         setErrorMessage('Error detecting Ethereum provider');
       }
     };
-
     getProvider();
-
     // Cleanup function to remove event listeners
     return () => {
       try {
@@ -138,22 +166,33 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
   // Function to connect MetaMask
   const connectMetaMask = async () => {
     setIsConnecting(true);
+    if (!window.ethereum) {
+      console.warn('MetaMask is not installed or not accessible.');
+      // Show error notification if MetaMask is not installed or not accessible
+      showNotification({
+        type: 'error',
+        message: 'MetaMask is not installed or not accessible.',
+        options: { position: 'top-center' },
+      });
+      setIsConnecting(false);
+      return;
+    }
 
     try {
       // Request account
-      const accounts: any = await window.ethereum?.request({
+      const accounts: any = await window.ethereum.request({
         method: 'eth_requestAccounts',
       });
       if (accounts.length > 0) {
         // Request for sign verification
         const message = 'Connect + Sign';
-        await window.ethereum?.request({
+        await window.ethereum.request({
           method: 'personal_sign',
           params: [message, accounts[0]],
         });
         updateWallet(accounts);
       } else {
-        console.warn('No accounts were found, please add account first.');
+        console.warn('No accounts were found, please add an account first.');
         // Show error notification if there's no account
         showNotification({
           type: 'error',
@@ -163,6 +202,11 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
       }
     } catch (err: any) {
       console.error('Error connecting MetaMask:', err);
+      showNotification({
+        type: 'error',
+        message: 'Error connecting MetaMask. Please check log and try again.',
+        options: { position: 'top-center' },
+      });
       setErrorMessage(err.message);
     }
     setIsConnecting(false);
@@ -187,7 +231,9 @@ export const AuthContextProvider = ({ children }: PropsWithChildren) => {
         error: !!errorMessage,
         errorMessage,
         isConnecting,
-        primeSdk,
+        sdkPerChain,
+        walletProvider,
+        networks,
         connectMetaMask,
         clearError,
         logout,
