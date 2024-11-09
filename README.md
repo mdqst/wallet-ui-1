@@ -1,6 +1,6 @@
 # Etherspot Wallet Demo
 
-This is a wallet UI application that showcases the usage of Etherspot UI components. Developers can use this as a guide when building their own applications using Etherspot UI. Etherspot UI components created using Etherspot Transaction Kit for sending transactions, sending ERC tokens, and other Ethereum-related functionalities which are running on blockchain. For styling of all components of Etherspot UI, tailwind has been configured so, developer can use tailwind default classes and override tailwind css using simple styling also.
+This is a wallet UI application that showcases the usage of Etherspot UI components. Developers can use this as a guide when building their own applications using Etherspot UI. Etherspot UI components created using Etherspot Transaction Kit for sending transactions, sending ERC tokens, and other Ethereum-related functionalities which are running on blockchain. For styling of all components of Etherspot UI, tailwind has been configured so, developers can use tailwind default classes and override tailwind css using simple styling also.
 
 ## Getting Started
 
